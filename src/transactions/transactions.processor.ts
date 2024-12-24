@@ -8,16 +8,15 @@ export class TransactionsProcessor {
 
   @Process('transaction')
   async handleTransaction(job: Job) {
-    const { type, userId, amount, loggedInUserId } = job.data;
+    const { type, userId, amount, loggedInUserId, fromUserId, toUserId } = job.data;
     if (type === 'balance') {
       await this.transactionsService.balance(loggedInUserId, userId);
-    } else if (type === 'deposit') {
-      await this.transactionsService.deposit(userId, amount);
+    }else if (type === 'deposit') {
+      await this.transactionsService.processDeposit(userId, amount);
     } else if (type === 'withdraw') {
-      await this.transactionsService.withdraw(loggedInUserId, userId, amount);
+      await this.transactionsService.processWithdraw(loggedInUserId, userId, amount);
     } else if (type === 'transfer') {
-      const { toUserId } = job.data;
-      await this.transactionsService.transfer(loggedInUserId, userId, toUserId, amount);
+      await this.transactionsService.processTransfer(loggedInUserId, fromUserId, toUserId, amount);
     }
   }
 }
